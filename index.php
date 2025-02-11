@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Mohammad Usman Asegaf Bagian FrontEnd-->
+<!-- Mohammad Usman Asegaf-->
 
 <html lang="en">
 
@@ -516,7 +516,7 @@
           document.getElementById('registrationForm').reset();
 
           setTimeout(() => {
-            window.location.href = 'dashboard/index.php';
+            window.location.href = 'dashboard/index2.php';
           }, 500);
         })
         .catch(error => {
@@ -547,7 +547,11 @@
           if (data.token) {
             alert('Login berhasil!');
             document.getElementById('loginModal').style.display = 'none';
+            localStorage.removeItem('authToken');
             localStorage.setItem('authToken', data.token);
+            setTimeout(() => {
+              window.location.href = 'dashboard/index2.php';
+            }, 500);
           } else {
             alert(data.message || 'Login gagal!');
           }

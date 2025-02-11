@@ -48,11 +48,7 @@ app.post('/api/login', (req, res) => {
             if (err) return res.status(500).json({ message: 'Error comparing passwords' });
 
             if (isMatch) {
-                const token = jwt.sign(
-                    { userId: user.user_id, username: user.username },
-                    'your_secret_key',
-                    { expiresIn: '1h' }
-                );
+              const token = JSON.stringify({ userId: user.user_id, username: user.username });
                 return res.json({ message: 'Login successful', token });
             } else {
                 return res.status(401).json({ message: 'Invalid credentials.' });
