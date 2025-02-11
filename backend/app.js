@@ -1,7 +1,6 @@
 const mysql = require('mysql2');
 const express = require('express');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const cors = require('cors');
 
 const app = express();
@@ -36,7 +35,7 @@ app.post('/api/login', (req, res) => {
 
     const query = 'SELECT * FROM users WHERE username = ?';
     db.query(query, [username], (err, results) => {
-        if (err) return res.status(500).json({ message: 'Database error', error: err });
+        if (err) return res.status(500).json({ message: 'Database error' });
 
         if (results.length === 0) {
             return res.status(401).json({ message: 'Invalid credentials.' });
@@ -48,8 +47,10 @@ app.post('/api/login', (req, res) => {
             if (err) return res.status(500).json({ message: 'Error comparing passwords' });
 
             if (isMatch) {
-              const token = JSON.stringify({ userId: user.user_id, username: user.username });
-                return res.json({ message: 'Login successful', token });
+                return res.json({ 
+                    message: 'Login successful',
+                    username: user.username 
+                });
             } else {
                 return res.status(401).json({ message: 'Invalid credentials.' });
             }
@@ -58,7 +59,6 @@ app.post('/api/login', (req, res) => {
 });
 
 // API untuk mendaftarkan user berserta paket yang di pilih
-// Updated backend registration API
 app.post('/api/register', async (req, res) => {
   const { username, password, email, phone, address, package_id, latitude, longitude } = req.body;
 

@@ -544,15 +544,16 @@
       })
         .then(response => response.json())
         .then(data => {
-          if (data.token) {
+          if (data.message === 'Login successful') { // Ganti pengecekan dari token ke message
             alert('Login berhasil!');
             document.getElementById('loginModal').style.display = 'none';
-            localStorage.removeItem('authToken');
-            localStorage.setItem('authToken', data.token);
-            setTimeout(() => {
-              window.location.href = 'dashboard/index2.php';
-            }, 500);
-          } else {
+            // Hapus dulu username lama jika ada
+            localStorage.removeItem('username');
+            // Simpan username baru
+            localStorage.setItem('username', username);
+            window.location.href = 'dashboard/index2.php'; // Hapus setTimeout
+          }
+          else {
             alert(data.message || 'Login gagal!');
           }
         })

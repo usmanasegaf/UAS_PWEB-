@@ -1,6 +1,3 @@
-<?php
-session_start();
-?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -19,6 +16,34 @@ session_start();
 </head>
 
 <body>
+    <div id="userDisplay"></div>
+    <script>
+        // Fungsi untuk redirect ke login
+        function redirectToLogin() {
+            window.location.href = '../index.php';
+        }
+
+        // Ambil username dari localStorage
+        const username = localStorage.getItem('username');
+
+        // Cek username saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                if (username && username.length > 0) {
+                    alert('Selamat datang, ' + username + '!');
+                    document.getElementById('userDisplay').textContent = username;
+                } else {
+                    alert('Session telah berakhir. Silakan login kembali.');
+                    redirectToLogin();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Kembali ke halaman login.');
+                redirectToLogin();
+            }
+        });
+    </script>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow fixed-top">
         <div class="container">
