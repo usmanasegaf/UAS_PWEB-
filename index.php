@@ -281,69 +281,36 @@
       d="M0,480L26.7,480C53.3,480,107,480,160,474.7C213.3,469,267,459,320,421.3C373.3,384,427,320,480,330.7C533.3,341,587,427,640,426.7C693.3,427,747,341,800,330.7C853.3,320,907,384,960,410.7C1013.3,437,1067,427,1120,400C1173.3,373,1227,331,1280,336C1333.3,341,1387,395,1413,421.3L1440,448L1440,320L1413.3,320C1386.7,320,1333,320,1280,320C1226.7,320,1173,320,1120,320C1066.7,320,1013,320,960,320C906.7,320,853,320,800,320C746.7,320,693,320,640,320C586.7,320,533,320,480,320C426.7,320,373,320,320,320C266.7,320,213,320,160,320C106.7,320,53,320,27,320L0,320Z">
     </path>
   </svg>
-
-  <!-- get data product -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('http://localhost:3000/api/packages')
-        .then(response => response.json())
-        .then(packages => {
-          const container = document.getElementById('packagesContainer');
-          container.innerHTML = ''; // Kosongkan kontainer sebelum menambahkan data baru
-
-          packages.forEach(pkg => {
-            const card = `
-              <div class="col-md-4 mb-3">
-                <div class="card shadow-sm border-0">
-                  <div class="card-header text-center bg-light" style="border-bottom: none;">
-                    <h5 style="color: #5d5a88;">${pkg.package_name}</h5>
-                    <h1 class="fw-semibold" style="color: #5d5a88;">Rp ${parseFloat(pkg.price).toLocaleString()}</h1>
-                    <p style="color: #5d5a88;">Billed ${pkg.billing_cycle === 'monthly' ? 'Monthly' : 'Yearly'}</p>
-                    <a href="#pendaftaran" class="btn btn-primary custom-btn mb-1" 
-                        style="background-color: #5d5a88; border: none;" 
-                        onclick="openRegistrationModal(event,${pkg.package_id})">
-                      Get Started
-                    </a>
-                  </div>
-                  <div class="card-body text-start ms-4">
-                    <p><i class="bi bi-speedometer2 me-2" style="color: #5d5a88;"></i> Speed: ${pkg.speed}</p>
-                    <p><i class="bi bi-people-fill me-2" style="color: #5d5a88;"></i> Max Connections: ${pkg.max_connections}</p>
-                    <p><i class="bi bi-phone-fill me-2" style="color: #5d5a88;"></i> Mobile App: ${pkg.mobile_app_available ? 'Available' : 'Not Available'}</p>
-                    <p><i class="bi bi-headset me-2" style="color: #5d5a88;"></i> Support: ${pkg.support_type}</p>
-                    <hr>
-                    ${pkg.features.split(',').map(feature => `
-                      <p><i class="bi bi-check-circle-fill me-2" style="color: #5d5a88;"></i> ${feature.trim()}</p>
-                    `).join('')}
-                  </div>
-                </div>
-              </div>`;
-            container.innerHTML += card;
-          });
-        })
-        .catch(error => console.error('Error:', error));
-    });
-  </script>
   <!-- Akhir products -->
 
 
   <!-- Login & Registration -->
-
-  <!-- Modal -->
+  <!-- Registration Modal -->
   <div class="modal" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="registrationModalLabel">Registration</h5>
-
         </div>
         <div class="modal-body">
           <form id="registrationForm">
             <input type="hidden" id="selectedPackageId" name="package_id">
 
             <div class="form-group">
-              <label>Nama Lengkap</label>
-              <input type="text" class="form-control" name="full_name" required>
+              <label>Username</label>
+              <input type="text" class="form-control" name="username_r" required>
+            </div>
+
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" class="form-control" name="password_r" id="password_r" required>
+            </div>
+
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" class="form-control" name="confirm_password" id="confirm_password" required>
+              <small id="passwordError" class="text-danger" style="display: none;">Passwords do not match</small>
             </div>
 
             <div class="form-group">
@@ -360,7 +327,7 @@
               <label>Alamat</label>
               <textarea class="form-control" name="address" required></textarea>
             </div>
-            <!-- Your form fields here -->
+
             <div class="form-group">
               <label for="latitude">Latitude</label>
               <input type="text" class="form-control" id="latitude" name="latitude" readonly>
@@ -372,13 +339,14 @@
             <div class="form-group">
               <div id="mapContainer"></div>
             </div>
-            <button type="submit" class="btn btn-primary">Daftar</button>
+            <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Daftar</button>
           </form>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Login Modal -->
   <div id="loginModal" class="modal">
     <div class="modal-content">
       <h4 class="modal-title">Login</h4>
@@ -399,8 +367,7 @@
         <div style="text-align: center; margin-top: 15px;">
           <span style="color: #666;">
             Belum mempunyai akun?
-            <a href="#" onclick="switchToRegister(event)"
-              style="color: #5d5a88; text-decoration: none; cursor: pointer;">
+            <a href="#" id="switchToRegisterBtn" style="color: #5d5a88; text-decoration: none; cursor: pointer;">
               Daftar disini
             </a>
           </span>
@@ -410,14 +377,10 @@
   </div>
 
   <script>
+    // Initialize coordinates on window load
     window.onload = loadCoordinates;
 
-    function openRegistrationModal(event, packageId) {
-      event.preventDefault(); // Prevent default anchor behavior
-      document.getElementById('selectedPackageId').value = packageId;
-      document.getElementById('registrationModal').style.display = 'block';
-    }
-
+    // Function to load coordinates and map
     function loadCoordinates() {
       navigator.geolocation.getCurrentPosition(position => {
         document.getElementById('latitude').value = position.coords.latitude;
@@ -433,66 +396,110 @@
         iframe.allowFullscreen = true;
 
         const mapContainer = document.getElementById('mapContainer');
-        mapContainer.innerHTML = ''; // Clear any existing iframes
+        mapContainer.innerHTML = '';
         mapContainer.appendChild(iframe);
       });
     }
 
+    // Function to open registration modal
+    function openRegistrationModal(event, packageId) {
+      event.preventDefault();
+      document.getElementById('selectedPackageId').value = packageId;
+      document.getElementById('registrationModal').style.display = 'block';
+      document.getElementById('loginModal').style.display = 'none';
+    }
+
+    // Function to open login modal
+    function openLoginModal(event) {
+      if (event) event.preventDefault();
+      document.getElementById('loginModal').style.display = 'block';
+      document.getElementById('registrationModal').style.display = 'none';
+    }
+
+    // Password validation
+    function validatePasswords() {
+      const password = document.getElementById('password_r').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      const passwordError = document.getElementById('passwordError');
+      const submitBtn = document.getElementById('registerSubmitBtn');
+
+      if (password === confirmPassword && password !== '') {
+        passwordError.style.display = 'none';
+        submitBtn.disabled = false;
+      } else {
+        passwordError.style.display = 'block';
+        submitBtn.disabled = true;
+      }
+    }
+
+    // Event Listeners
+    document.getElementById('password_r').addEventListener('input', validatePasswords);
+    document.getElementById('confirm_password').addEventListener('input', validatePasswords);
+
+    // Switch between modals
+    document.getElementById('switchToRegisterBtn').addEventListener('click', function (event) {
+      event.preventDefault();
+      document.getElementById('loginModal').style.display = 'none';
+      document.getElementById('registrationModal').style.display = 'block';
+    });
+
+    // Registration form submission
     document.getElementById('registrationForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const formData = new FormData(this);
 
+      // First validate passwords match
+      const password = formData.get('password_r');
+      const confirmPassword = formData.get('confirm_password');
+
+      if (password !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+      }
+
+      // Create the request body with the correct field names
+      const requestData = {
+        username: formData.get('username_r'),
+        password: formData.get('password_r'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        address: formData.get('address'),
+        package_id: formData.get('package_id'),
+        latitude: formData.get('latitude'),
+        longitude: formData.get('longitude')
+      };
+
+      // Log the data being sent (for debugging)
+      console.log('Sending registration data:', requestData);
+
       fetch('http://localhost:3000/api/register', {
         method: 'POST',
-        body: JSON.stringify({
-          full_name: formData.get("full_name"),
-          email: formData.get("email"),
-          phone: formData.get("phone"),
-          address: formData.get("address"),
-          package_id: formData.get("package_id"),
-          latitude: formData.get("latitude"),
-          longitude: formData.get("longitude")
-        }),
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify(requestData)
       })
-        .then(response => response.json())
-        .then(data => {
-          if (data.defaultPassword) {
-            alert(`Registrasi berhasil!\nUsername: ${data.username}\nPassword: ${data.defaultPassword}`);
-          } else {
-            alert('Registrasi berhasil!');
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
           }
-          document.getElementById('registrationModal').style.display = 'none';
+          return response.json();
         })
-        .catch(error => console.error('Error:', error));
+        .then(data => {
+          console.log('Registration successful:', data);
+          alert('Registrasi berhasil!');
+          document.getElementById('registrationModal').style.display = 'none';
+          // Clear the form
+          document.getElementById('registrationForm').reset();
+        })
+        .catch(error => {
+          console.error('Error during registration:', error);
+          alert(error.message || 'Terjadi kesalahan saat registrasi.');
+        });
     });
 
-    // Untuk close modal registrasi 
-    document.getElementById('registrationModal').addEventListener('click', function (event) {
-      if (event.target === this) { // 'this' mengacu pada registrationModal
-        this.style.display = 'none';
-      }
-    });
-  </script>
-
-  <script>
-    // Fungsi untuk membuka modal login
-    function openLoginModal(event) {
-      event.preventDefault();
-      document.getElementById('loginModal').style.display = 'block';
-    }
-
-    // Fungsi untuk beralih ke modal registrasi
-    function switchToRegister(event) {
-      event.preventDefault();
-      document.getElementById('loginModal').style.display = 'none';
-      document.getElementById('registrationModal').style.display = 'block';
-    }
-
-    // Event listener untuk submit form login
-    document.getElementById('loginForm').onsubmit = function (e) {
+    // Login form submission
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
       e.preventDefault();
 
       const username = document.getElementById('username').value;
@@ -522,24 +529,26 @@
           console.error('Error:', error);
           alert('Terjadi kesalahan saat login.');
         });
-    }
-
-    // Event listener untuk menutup modal dengan klik di luar
-    document.getElementById('loginModal').addEventListener('click', function (event) {
-      if (event.target === this) {
-        this.style.display = 'none';
-      }
     });
 
-    // Event listener untuk menutup modal dengan tombol ESC
+    // Close modals when clicking outside
+    window.onclick = function (event) {
+      if (event.target.id === 'loginModal') {
+        document.getElementById('loginModal').style.display = 'none';
+      }
+      if (event.target.id === 'registrationModal') {
+        document.getElementById('registrationModal').style.display = 'none';
+      }
+    };
+
+    // Close modals with ESC key
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') {
         document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('registrationModal').style.display = 'none';
       }
     });
   </script>
-
-  <!-- Akhir Login -->
 
 
 

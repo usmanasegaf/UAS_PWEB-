@@ -61,90 +61,49 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-// API untuk mengambil semua data paket berlangganan
-app.get('/api/packages', (req, res) => {
-    const query = 'SELECT * FROM subscription_packages';
-    
-    db.query(query, (err, results) => {
-        if (err) return res.status(500).json({ message: 'Database error', error: err });
-        return res.json(results);
-    });
-});
-
-// API untuk mengambil detail paket berdasarkan ID
-app.get('/api/packages/:id', (req, res) => {
-    const { id } = req.params;
-    const query = 'SELECT * FROM subscription_packages WHERE package_id = ?';
-
-    db.query(query, [id], (err, results) => {
-        if (err) return res.status(500).json({ message: 'Database error', error: err });
-
-        if (results.length === 0) {
-            return res.status(404).json({ message: 'Package not found' });
-        }
-
-        return res.json(results[0]);
-    });
-});
-
 // API untuk mendaftarkan user berserta paket yang di pilih
+// Updated backend registration API
 app.post('/api/register', async (req, res) => {
-    const { full_name, email, phone, address, package_id,latitude, longitude } = req.body;
-  
-    try {
-      const checkUserQuery = 'SELECT * FROM users WHERE email = ?';
-      db.query(checkUserQuery, [email], async (err, result) => {
-        if (err) throw err;
-  
-        let userId;
-        let passwordInfo = null; 
-        let usernameInfo = null;  
-  
-        if (result.length > 0) {
-          userId = result[0].user_id;
-        } else {
-          const defaultPassword = 'User@1234';
-          const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-  
-          // Generate default username
-          let defaultUsername = full_name.split(' ')[0].toLowerCase();
-  
-          const insertUserQuery = 'INSERT INTO users (email, phone_number, password, username) VALUES (?, ?, ?, ?)';
-          db.query(insertUserQuery, [email, phone, hashedPassword, defaultUsername], (err, userResult) => {
-            if (err) throw err;
-            userId = userResult.insertId;
-            passwordInfo = defaultPassword;
-            usernameInfo = defaultUsername;
-            continueRegistration();
-          });
-  
-          return; 
-        }
-  
-        continueRegistration();
-  
-        function continueRegistration() {
-          const insertRegistrationQuery = 'INSERT INTO registrations (user_id, address, package_id,latitude,longitude) VALUES (?, ?, ?, ?, ?)';
-          db.query(insertRegistrationQuery, [userId, address, package_id,latitude,longitude], (err, registrationResult) => {
-            if (err) throw err;
-  
-            const responseMessage = {
-              message: 'Pendaftaran berhasil!',
-              ...(passwordInfo && { defaultPassword: passwordInfo }),
-              ...(usernameInfo && { username: usernameInfo })
-            };
-  
-            res.status(201).json(responseMessage);
-          });
-        }
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Terjadi kesalahan saat mendaftarkan pengguna.' });
-    }
-});
-  
+  const { username, password, email, phone, address, package_id, latitude, longitude } = req.body;
 
+  try {
+    // Check if user already exists
+    const checkUserQuery = 'SELECT * FROM users WHERE email = ? OR username = ?';
+    db.query(checkUserQuery, [email, username], async (err, result) => {
+      if (err) throw err;
+
+      if (result.length > 0) {
+        return res.status(400).json({ message: 'Email or username already exists' });
+      }
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Insert into users table with all information
+      const insertUserQuery = 'INSERT INTO users (username, password, email, phone_number, address, package_id, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+      db.query(insertUserQuery, [
+        username,
+        hashedPassword,
+        email,
+        phone,
+        address,
+        package_id,
+        latitude,
+        longitude
+      ], (err, userResult) => {
+        if (err) throw err;
+
+        res.status(201).json({
+          message: 'Pendaftaran berhasil!',
+          userId: userResult.insertId
+        });
+      });
+    });
+  } catch (error) {
+    console.error('Error in registration:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
