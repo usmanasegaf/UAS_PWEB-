@@ -344,8 +344,10 @@
               <button type="button" class="package-btn" onclick="selectPackage(2)">Paket 2</button>
               <button type="button" class="package-btn" onclick="selectPackage(3)">Paket 3</button>
             </div>
-            <button type="submit" class="btn btn-primary" id="registerSubmitBtn"
-              style="background-color: #5d5a88; border: none;">Daftar</button>
+            <div class="d-flex justify-content-center mt-3">
+              <button type="submit" class="btn btn-primary custom-btn-2" id="registerSubmitBtn" style="background-color: #5d5a88; border: none; min-width: 306px;  padding: 12px 20px;
+    font-size: 19px;">Daftar</button>
+            </div>
           </form>
         </div>
       </div>
