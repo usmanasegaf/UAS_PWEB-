@@ -514,6 +514,10 @@
           document.getElementById('registrationModal').style.display = 'none';
           // Clear the form
           document.getElementById('registrationForm').reset();
+
+          setTimeout(() => {
+            window.location.href = 'dashboard/index.php';
+          }, 500);
         })
         .catch(error => {
           console.error('Error during registration:', error);
