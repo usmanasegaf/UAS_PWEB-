@@ -38,26 +38,6 @@ session_start();
     </nav>
     <!-- Akhir Navbar -->
 
-    <script>
-        // Ambil token dari localStorage
-        const token = localStorage.getItem('authToken');
-
-        if (!token) {
-            alert("Anda harus login terlebih dahulu!");
-            // window.location.href = "../index.php"; //jika masih testing belum dinyalakan
-        } else {
-            // Parse token JSON
-            try {
-                const user = JSON.parse(token);
-                document.getElementById("username").textContent = user.username;
-            } catch (e) {
-                alert("Token tidak valid, silakan login ulang.");
-                localStorage.removeItem('authToken');
-                window.location.href = "../login.php";
-            }
-        }
-    </script>
-
     <!-- informasi akun -->
     <section id="informasi_akun">
         <div class="container mt-4">
