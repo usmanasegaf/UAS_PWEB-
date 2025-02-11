@@ -325,10 +325,8 @@
   </script>
   <!-- Akhir products -->
 
-  <!-- Pendaftaran -->
-  <!-- Akhir Pendaftaran-->
 
-  <!-- Login -->
+  <!-- Login & Registration -->
 
   <!-- Modal -->
   <div class="modal" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel"
@@ -446,7 +444,15 @@
 
       fetch('http://localhost:3000/api/register', {
         method: 'POST',
-        body: JSON.stringify(Object.fromEntries(formData)),
+        body: JSON.stringify({
+          full_name: formData.get("full_name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          address: formData.get("address"),
+          package_id: formData.get("package_id"),
+          latitude: formData.get("latitude"),
+          longitude: formData.get("longitude")
+        }),
         headers: {
           'Content-Type': 'application/json'
         }
