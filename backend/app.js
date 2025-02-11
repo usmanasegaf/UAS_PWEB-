@@ -80,16 +80,16 @@ app.post('/api/register', async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert into users table with all information
-      const insertUserQuery = 'INSERT INTO users (username, password, email, phone_number, address, package_id, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+      const insertUserQuery = 'INSERT INTO users (username, password, email, phone_number, package_id, latitude, longitude , address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
       db.query(insertUserQuery, [
         username,
         hashedPassword,
         email,
         phone,
-        address,
         package_id,
         latitude,
-        longitude
+        longitude,
+        address
       ], (err, userResult) => {
         if (err) throw err;
 

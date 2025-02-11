@@ -339,7 +339,13 @@
             <div class="form-group">
               <div id="mapContainer"></div>
             </div>
-            <button type="submit" class="btn btn-primary" id="registerSubmitBtn">Daftar</button>
+            <div class="package-options">
+              <button type="button" class="package-btn" onclick="selectPackage(1)">Paket 1</button>
+              <button type="button" class="package-btn" onclick="selectPackage(2)">Paket 2</button>
+              <button type="button" class="package-btn" onclick="selectPackage(3)">Paket 3</button>
+            </div>
+            <button type="submit" class="btn btn-primary" id="registerSubmitBtn"
+              style="background-color: #5d5a88; border: none;">Daftar</button>
           </form>
         </div>
       </div>
@@ -377,6 +383,21 @@
   </div>
 
   <script>
+    let selectedPackage = 1; // Variabel global untuk menyimpan paket yang dipilih
+
+    function selectPackage(num) {
+      // Remove active class from all buttons
+      document.querySelectorAll('.package-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Add active class to selected button
+      event.target.classList.add('active');
+
+      // Simpan nomor paket yang dipilih
+      selectedPackage = num;
+    }
+
     // Initialize coordinates on window load
     window.onload = loadCoordinates;
 
@@ -464,7 +485,7 @@
         email: formData.get('email'),
         phone: formData.get('phone'),
         address: formData.get('address'),
-        package_id: formData.get('package_id'),
+        package_id: selectedPackage,
         latitude: formData.get('latitude'),
         longitude: formData.get('longitude')
       };
