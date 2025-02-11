@@ -2,7 +2,6 @@ const mysql = require('mysql2');
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const db = require('../config/db');
 const cors = require('cors');
 
 const app = express();
