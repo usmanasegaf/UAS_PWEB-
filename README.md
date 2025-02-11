@@ -1,2 +1,1 @@
-## Bagian Frontend saja
-### Hasil akhir mungkin lengkap
+# Integrasi bag lain dan penambahan frontend backend
