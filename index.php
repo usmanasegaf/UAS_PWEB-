@@ -66,26 +66,18 @@
             aria-label="Slide 1"></button>
           <button type="button" data-bs-target="#carouselPaket" data-bs-slide-to="1" aria-label="Slide 2"></button>
           <button type="button" data-bs-target="#carouselPaket" data-bs-slide-to="2" aria-label="Slide 3"></button>
-          <button type="button" data-bs-target="#carouselPaket" data-bs-slide-to="3" aria-label="Slide 4"></button>
         </div>
 
         <!-- Slides -->
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <img src="https://placehold.co/600x400" class="d-block w-100" alt="Image 1"
-              style="max-height: 550px; object-fit: cover;">
+            <img src="images/1.png" class="d-block w-100" alt="Image 1" style="max-height: 550px; object-fit: cover;">
           </div>
           <div class="carousel-item">
-            <img src="https://placehold.co/600x400" class="d-block w-100" alt="Image 1"
-              style="max-height: 550px; object-fit: cover;">
+            <img src="images/2.png" class="d-block w-100" alt="Image 1" style="max-height: 550px; object-fit: cover;">
           </div>
           <div class="carousel-item">
-            <img src="https://placehold.co/600x400" class="d-block w-100" alt="Image 1"
-              style="max-height: 550px; object-fit: cover;">
-          </div>
-          <div class="carousel-item">
-            <img src="https://placehold.co/600x400" class="d-block w-100" alt="Image 1"
-              style="max-height: 550px; object-fit: cover;">
+            <img src="images/3.png" class="d-block w-100" alt="Image 1" style="max-height: 550px; object-fit: cover;">
           </div>
         </div>
 
